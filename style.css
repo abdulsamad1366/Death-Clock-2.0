@@ -45,11 +45,21 @@ body {
   overflow: hidden;
   font-family: 'Plus Jakarta Sans', system-ui;
   color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   
-  /* Animated gradient background */
+  /* Animated gradient background - reduced on mobile */
   background: linear-gradient(-45deg, #0f172a, #0c4a6e, #1e1b4b, #0f172a);
   background-size: 400% 400%;
   animation: animatedBackground 20s ease infinite;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
 }
 
 /* --- UPDATED: 3-Column Container --- */
@@ -385,6 +395,13 @@ body {
 
 @media (max-width: 900px) {
   /* --- UPDATED: On small tablet, stack to 1 column --- */
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   .container {
     grid-template-columns: 1fr; /* Stack everything */
     max-width: 600px;
@@ -399,23 +416,24 @@ body {
   .notes-column {
     order: 1; /* Notes first */
     height: auto;
-    min-height: 300px; /* Give it some space */
-    padding: 2.5rem 0.5rem 0;
+    min-height: 280px;
+    padding: 1.5rem 0.75rem 0;
   }
 
   .main-column {
     order: 2; /* Widgets second */
     height: auto;
     overflow: visible;
-    padding: 1rem 0.5rem;
+    padding: 0.75rem 0.75rem;
+    gap: 0.75rem;
   }
   
   .right-section {
     order: 3; /* Clock last */
     height: auto;
     min-height: auto;
-    padding: 1rem 0 4rem 0;
-    margin-top: 2rem;
+    padding: 0.75rem 0 3.5rem 0;
+    margin-top: 1.5rem;
     position: relative;
   }
   
@@ -423,6 +441,18 @@ body {
     transform: scale(0.9);
     transform-origin: bottom center;
     margin-bottom: 3rem;
+  }
+
+  .clock-swiper {
+    width: min(92vw, var(--clock-size));
+    height: min(92vw, var(--clock-size));
+  }
+
+  .clock,
+  .clock-digital,
+  .clock-analog {
+    width: 100%;
+    height: 100%;
   }
 
   .clock-title {
@@ -444,6 +474,9 @@ body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
+    max-width: calc(100vw - 2rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* --- UPDATED: Controls positioning --- */
@@ -456,6 +489,15 @@ body {
 @media (max-width: 768px) {
   .main-column {
     padding: 1.5rem 0.5rem;
+  }
+
+  #search-input,
+  #todo-input,
+  #new-folder-input,
+  #new-note-input,
+  .goal-input,
+  #death-year {
+    font-size: 16px;
   }
 
   .greeting-section h1 {
@@ -480,8 +522,20 @@ body {
   }
   
   .clock-container {
-    transform: scale(0.8);
+    transform: none;
     margin-bottom: 2rem;
+  }
+
+  .clock-nav {
+    opacity: 1;
+  }
+
+  .clock-nav.prev {
+    left: -30px;
+  }
+
+  .clock-nav.next {
+    right: -30px;
   }
 
   .clock-title .title-text {
@@ -511,8 +565,13 @@ body {
   }
   
   .clock-container {
-    transform: scale(0.7);
+    transform: none;
     margin-bottom: 1rem;
+  }
+
+  .clock-swiper {
+    width: 88vw;
+    height: 88vw;
   }
   
   .clock-title .title-text {
@@ -530,11 +589,21 @@ body {
   .countdown-timer {
     font-size: 0.9rem;
     padding: 0.6rem 1rem;
+    bottom: calc(4.25rem + env(safe-area-inset-bottom));
   }
 
   /* --- UPDATED: Controls positioning --- */
   .bottom-controls {
-    transform: scale(0.9);
+    transform: none;
+    right: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+    gap: 0.75rem;
+  }
+
+  .sound-toggle,
+  .fullscreen-toggle {
+    width: 52px;
+    height: 52px;
   }
 }
 
@@ -545,7 +614,7 @@ body {
   inset: 1px;
   margin: auto;
   
-  /* Animated liquid gradient */
+  /* Animated liquid gradient - respect reduced motion */
   background: linear-gradient(135deg, 
     rgba(0, 0, 0, 0.85), 
     rgba(12, 74, 110, 0.75), /* From --clock-clr */
@@ -567,6 +636,17 @@ body {
   );
   border-radius: 50%;
   z-index: 20;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation-duration: 60s; /* Slower bg animation */
+  }
+  
+  .clock::before {
+    animation-duration: 30s; /* Slower clock mask */
+    background-size: 200% 200%; /* Less movement */
+  }
 }
 
 .clock > div {
@@ -674,21 +754,24 @@ body {
 
 /* Dialog styles */
 dialog {
-  width: min(calc(100% - 2rem), 380px);
-  padding: 1rem;
+  width: min(90vw, 380px);
+  max-height: 90vh;
+  padding: 1.5rem;
   border: none;
-  border-radius: 999px;
-  background: rgba(0 0 0 / 0.25);
+  border-radius: 2rem;
+  background: rgba(0 0 0 / 0.3);
+  backdrop-filter: blur(20px);
   text-align: center;
-  aspect-ratio: 1;
+  aspect-ratio: auto;
   overflow: visible;
+  margin: auto;
 
   @starting-style {
     opacity: 0;
-    scale: 0;
+    scale: 0.9;
   }
-  transition: opacity 500ms ease-in,
-    scale 500ms cubic-bezier(0.28, -0.55, 0.27, 1.55);
+  transition: opacity 400ms ease-in,
+    scale 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 /* Backdrop styling */
 dialog[open]::backdrop {
@@ -704,23 +787,27 @@ dialog[open]::backdrop {
 
 dialog .btn-dialog-close {
   position: absolute;
-  top: 0rem;
-  right: 25%;
+  top: 1rem;
+  right: 1.5rem;
   aspect-ratio: 1;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background-color: black;
-  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  font-size: 1.4rem;
   color: white;
   border: none;
   outline: none;
   cursor: pointer;
-  transition: rotate 300ms ease-in-out;
+  transition: all 0.3s ease;
   z-index: 11;
+  
   &:focus-visible,
   &:hover {
+    background: rgba(255, 255, 255, 0.25);
     rotate: 90deg;
+    scale: 1.1;
   }
 }
 
@@ -994,18 +1081,18 @@ dialog .btn-dialog-close {
 .links-grid {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem;
+  gap: 0.5rem;
+  padding: 0.5rem;
   background: var(--card-bg);
   border-radius: 1rem;
-  padding: 0.5rem;
   backdrop-filter: var(--card-blur);
   border: var(--card-border);
   box-shadow: var(--card-shadow);
   overflow-x: auto;
   white-space: nowrap;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
 }
 
 .links-grid::-webkit-scrollbar {
@@ -1017,18 +1104,19 @@ dialog .btn-dialog-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.8rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
   transition: all 0.3s ease;
   flex: 0 0 auto;
-  min-width: 32px;
+  min-width: 52px;
+  scroll-snap-align: start;
   z-index: 1;
 }
 
 .quick-link img {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
@@ -1062,10 +1150,10 @@ dialog .btn-dialog-close {
   z-index: 9998;
 }
 
-.quick-link:hover .link-tooltip {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(-8px);
+/* Remove hover tooltips on mobile - use native title */
+.quick-link:hover .link-tooltip,
+.quick-link:focus .link-tooltip {
+  display: none;
 }
 
 /* Sound Control */
@@ -1085,14 +1173,14 @@ dialog .btn-dialog-close {
   border: var(--card-border);
   box-shadow: var(--card-shadow);
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: white;
-  padding: 0.8rem;
+  padding: 0.75rem;
   transition: all 0.3s ease;
 }
 
@@ -1308,10 +1396,10 @@ dialog .btn-dialog-close {
   background: var(--accent-color);
   border: none;
   color: white;
-  border-radius: 0.5rem;
-  width: 36px;
-  height: 36px;
-  font-size: 1.5rem;
+  border-radius: 0.75rem;
+  width: 48px;
+  height: 48px;
+  font-size: 1.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -1319,7 +1407,7 @@ dialog .btn-dialog-close {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  padding-bottom: 2px; /* Visual centering for the '+' */
+  flex-shrink: 0;
 }
 
 #todo-form button:hover {
@@ -1438,12 +1526,13 @@ dialog .btn-dialog-close {
   background: rgba(255, 255, 255, 0.1);
   border: none;
   color: var(--text-primary);
-  border-radius: 0.5rem;
-  width: 36px;
-  height: 36px;
-  font-size: 1.2rem;
+  border-radius: 0.75rem;
+  width: 48px;
+  height: 48px;
+  font-size: 1.4rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  flex-shrink: 0;
 }
 
 #back-to-folders-btn:hover {
@@ -1484,10 +1573,10 @@ dialog .btn-dialog-close {
   background: var(--accent-color);
   border: none;
   color: white;
-  border-radius: 0.5rem;
-  width: 36px;
-  height: 36px;
-  font-size: 1.5rem;
+  border-radius: 0.75rem;
+  width: 48px;
+  height: 48px;
+  font-size: 1.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -1495,7 +1584,7 @@ dialog .btn-dialog-close {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  padding-bottom: 2px;
+  flex-shrink: 0;
 }
 
 #new-folder-form button:hover, #new-note-form button:hover {
@@ -1610,18 +1699,23 @@ dialog .btn-dialog-close {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
+  width: 52px;
+  height: 52px;
+  font-size: 1.8rem;
   cursor: pointer;
   z-index: 100;
   backdrop-filter: var(--card-blur);
   transition: all 0.3s ease;
   opacity: 0; /* Hidden by default */
+  
+  /* Always visible on mobile */
+  @media (max-width: 900px) {
+    opacity: 0.8;
+  }
 }
 
 .clock-container:hover .clock-nav {
@@ -1629,11 +1723,11 @@ dialog .btn-dialog-close {
 }
 
 .clock-nav.prev {
-  left: -50px;
+  left: -2.75rem;
 }
 
 .clock-nav.next {
-  right: -50px;
+  right: -2.75rem;
 }
 
 .clock-nav:hover {

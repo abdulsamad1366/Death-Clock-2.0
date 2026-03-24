@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>My Startup Page</title>
   <link rel="stylesheet" href="./style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +19,7 @@
           <h3>My Notes</h3>
         </div>
         <form id="new-folder-form">
-          <input type="text" id="new-folder-input" placeholder="Create a new folder...">
+          <input type="text" id="new-folder-input" placeholder="Create a new folder..." autocapitalize="sentences" autocorrect="on" autocomplete="off" spellcheck="true">
           <button type="submit" aria-label="Add folder">+</button>
         </form>
         <ul id="folder-list">
@@ -31,7 +32,7 @@
           <h3 id="current-folder-name">Folder</h3>
         </div>
         <form id="new-note-form">
-          <input type="text" id="new-note-input" placeholder="Add a new note...">
+          <input type="text" id="new-note-input" placeholder="Add a new note..." autocapitalize="sentences" autocorrect="on" autocomplete="off" spellcheck="true">
           <button type="submit" aria-label="Add note">+</button>
         </form>
         <ul id="note-list">
@@ -72,7 +73,7 @@
             </div>
           </div>
         </div>
-        <input type="text" id="search-input" placeholder="Type anything and press Enter to search...">
+        <input type="text" id="search-input" placeholder="Type anything and press Enter to search..." autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" inputmode="search">
         <button id="search-button">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -123,14 +124,14 @@
           <h3>Ultimate Goal :</h3>
       </div>
       <div class="goal-content">
-          <input type="text" class="goal-input" placeholder="Write your goal here...">
+          <input type="text" class="goal-input" placeholder="Write your goal here..." autocapitalize="sentences" autocorrect="on" autocomplete="off" spellcheck="true">
       </div>
     </div>
 
     <div class="todo-section">
       <h3>To-Do List</h3>
       <form id="todo-form">
-        <input type="text" id="todo-input" placeholder="Add a new task...">
+        <input type="text" id="todo-input" placeholder="Add a new task..." autocapitalize="sentences" autocorrect="on" autocomplete="off" spellcheck="true">
         <button type="submit" aria-label="Add task">+</button>
       </form>
       <ul id="todo-list">

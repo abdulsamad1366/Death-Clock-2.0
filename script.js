@@ -91,7 +91,7 @@ searchEngineOptions.forEach(option => {
 function handleSearch() {
   const query = searchInput.value.trim();
   if (query) {
-    window.open(currentSearchEngine.url + encodeURIComponent(query), '_blank');
+    window.open(currentSearchEngine.url + encodeURIComponent(query), '_blank', 'noopener,noreferrer');
     searchInput.value = '';
   }
 }
@@ -164,6 +164,8 @@ function getLocale() {
 }
 
 let locale = getLocale();
+const isMobileViewport = window.matchMedia('(max-width: 900px)').matches;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const currentLangDisplay = document.getElementById('current-lang');
 const languageDialog = document.getElementById('language-dialog');
@@ -530,12 +532,28 @@ function rotateClockFaces() {
                 }
             });
         });
-        // request next frame
-        requestAnimationFrame(updateRotations);
+        // Use lower-frequency updates on mobile/reduced motion devices
+        if (!isMobileViewport && !prefersReducedMotion) {
+          requestAnimationFrame(updateRotations);
+        }
     }
 
+    // Listen for viewport/orientation changes to adjust performance
+    const mediaQueryMobile = window.matchMedia('(max-width: 900px)');
+    const mediaQueryReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    
+    mediaQueryMobile.addListener(() => {
+      isMobileViewport = mediaQueryMobile.matches;
+    });
+    mediaQueryReducedMotion.addListener(() => {
+      prefersReducedMotion = mediaQueryReducedMotion.matches;
+    });
+    
     updateRotations();
-}
+    if (isMobileViewport || prefersReducedMotion) {
+      setInterval(updateRotations, 1000);
+    }
+  }
 
 // create language options
 function createLanguageOptions() {
@@ -940,21 +958,53 @@ const clockDesigns = document.querySelectorAll('.clock-face-container');
 let currentClockIndex = 0;
 
 function initClockSwiper() {
-  clockPrevBtn.addEventListener('click', () => {
+  const goToPrevClock = () => {
     currentClockIndex--;
     if (currentClockIndex < 0) {
       currentClockIndex = clockDesigns.length - 1;
     }
     showClock(currentClockIndex);
-  });
+  };
 
-  clockNextBtn.addEventListener('click', () => {
+  const goToNextClock = () => {
     currentClockIndex++;
     if (currentClockIndex >= clockDesigns.length) {
       currentClockIndex = 0;
     }
     showClock(currentClockIndex);
+  };
+
+  clockPrevBtn.addEventListener('click', () => {
+    goToPrevClock();
   });
+
+  clockNextBtn.addEventListener('click', () => {
+    goToNextClock();
+  });
+
+  const clockSwiper = document.querySelector('.clock-swiper');
+  if (!clockSwiper) return;
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const swipeThreshold = 40;
+
+  clockSwiper.addEventListener('touchstart', (event) => {
+    touchStartX = event.changedTouches[0].screenX;
+  }, { passive: true });
+
+  clockSwiper.addEventListener('touchend', (event) => {
+    touchEndX = event.changedTouches[0].screenX;
+    const deltaX = touchEndX - touchStartX;
+
+    if (Math.abs(deltaX) < swipeThreshold) return;
+
+    if (deltaX < 0) {
+      goToNextClock();
+    } else {
+      goToPrevClock();
+    }
+  }, { passive: true });
 }
 
 function showClock(index) {
